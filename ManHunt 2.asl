@@ -12,80 +12,17 @@ state("ManHunt2")
 	float Pos: 0x3D71C0, 0x34;
 }
 
-startup
-{
-		settings.Add("LRT", true, "LRT");
-		settings.SetToolTip("LRT", "Tick this box if you're using load remover timer");
-		settings.Add("IGT", false, "IGT");
-		settings.SetToolTip("IGT", "Tick this box if you're using in game timer");
-}
-
-init
-{
-	vars.totalGameTime = 0;
-}
-
 start
 {
-	if(settings["LRT"] || settings["IGT"]){
-		if(current.IGT > old.IGT){
-			vars.totalGameTime = 0;
-			return true;
-		}
-	}
+	return current.IGT > old.IGT;
 }
 
 split
 {
-	if(settings["LRT"]){
-		if(current.lvl > old.lvl || current.IGT == old.IGT && current.lvl == 14 && current.Cutscene == 1 && current.Pos > 110){
-			return true;
-		}
-	}
-    
-    if(settings["IGT"]){
-	if (current.lvl > old.lvl) {
-        return true; 
-		}
-	}
-
+	return current.lvl > old.lvl || current.IGT == old.IGT && current.lvl == 14 && current.Cutscene == 1 && current.Pos > 110;
 }
-	
+
 isLoading
 {
-	if(settings["LRT"]){
-		
-		if(current.Menu == 0 || current.Menu == 4){
-			return true;
-		}
-        else{
-            return false;
-        }
-	}
-	
-	if(settings["IGT"]){
-		return true;
-	}
+	return current.Menu == 0 || current.Menu == 4;
 }
-
-gameTime
-{
-	if(settings["IGT"]){
-		if(current.IGT > old.IGT){
-		return TimeSpan.FromSeconds(Math.Floor(vars.totalGameTime + current.IGT));
-	}
-	if(current.IGT == 0 && old.IGT > 0){
-			vars.totalGameTime = System.Math.Floor(vars.totalGameTime + old.IGT);
-			return TimeSpan.FromSeconds(System.Math.Floor(vars.totalGameTime + current.IGT));
-		}
-	}
-}
-// reset
-// {
-// 	if(settings["LRT"] || settings["IGT"]){
-// 		if(current.IGT == old.IGT && old.IGT > 0 && current.Menu == 0 && current.Cutscene == 0 && ){
-// 		return true;
-// 	}
-// 	}
-// }
-
